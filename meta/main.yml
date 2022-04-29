@@ -15,12 +15,9 @@ galaxy_info:
         - buster
         - bullseye
     - name: FreeBSD
-      versions:
-        - 13
     - name: Ubuntu
       versions:
         - focal
-        - jammy
   galaxy_tags:
     - openssh
     - ssh
