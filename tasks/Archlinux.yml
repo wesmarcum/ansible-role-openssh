@@ -1,0 +1,21 @@
+---
+- name: Install ssh packages
+  ansible.builtin.package:
+    name: "{{ openssh_packages }}"
+    state: present
+  become: true
+
+- name: Check for host keys
+  ansible.builtin.find:
+    paths: /etc/ssh
+    file_type: file
+    patterns: "ssh_host_*"
+  register: find_host_keys
+  become: true
+
+- name: Generate ssh host keys
+  ansible.builtin.service:
+    name: sshdgenkeys
+    state: restarted
+  become: true
+  when: find_host_keys.matched | int == 0

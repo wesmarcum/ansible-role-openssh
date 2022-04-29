@@ -1,0 +1,86 @@
+---
+- name: Set OS specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "vars/{{ ansible_os_family }}.yml"
+    - "vars/default.yml"
+
+- name: Include OS specific tasks
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - "tasks/{{ ansible_os_family }}.yml"
+    - "tasks/default.yml"
+
+- name: Set ssh version
+  block:
+    - name: Run ssh -V
+      ansible.builtin.command: /usr/bin/ssh -V
+      register: openssh_version_output
+      changed_when: false
+
+    - name: Set fact for openssh version
+      ansible.builtin.set_fact:
+        openssh_version: "{{ openssh_version_output.stderr | regex_search('\\d+\\.\\d') }}"
+  when: openssh_version is not defined
+
+- name: Create groups for ssh users
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ openssh_allowed_groups }}"
+  become: true
+
+- name: Add users to ssh group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    append: yes
+    groups: "{{ openssh_primary_group }}"
+  loop: "{{ openssh_allowed_users }}"
+  become: true
+  when: openssh_allowed_users | length > 0
+
+- name: Copy banner file
+  ansible.builtin.copy:
+    src: etc/ssh/ssh_banner
+    dest: /etc/ssh/ssh_banner
+    owner: "{{ openssh_owner }}"
+    group: "{{ openssh_group }}"
+    mode: '0640'
+  become: true
+  when: openssh_show_banner | bool
+
+- name: Create conf directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ openssh_owner }}"
+    group: "{{ openssh_group }}"
+    mode: '0755'
+  become: true
+  loop:
+    - "/etc/ssh/ssh_config.d"
+    - "/etc/ssh/sshd_config.d"
+
+- name: Copy ssh config
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: /etc/ssh/sshd_config
+    owner: "{{ openssh_owner }}"
+    group: "{{ openssh_group }}"
+    mode: '0640'
+    validate: "{{ openssh_validate_cmd }}"
+    backup: yes
+  with_first_found:
+    - "etc/ssh/sshd_config_{{ ansible_hostname }}.j2"
+    - "etc/ssh/sshd_config_default.j2"
+  notify: "restart {{ openssh_service }}"
+  become: true
+
+- name: Start ssh service
+  ansible.builtin.service:
+    name: "{{ openssh_service }}"
+    state: started
+  become: true
+
+- name: Run handlers
+  ansible.builtin.meta: flush_handlers

@@ -1,0 +1,14 @@
+---
+# Owner/group for config files
+openssh_owner: "root"
+openssh_group: "root"
+
+# SSH packages to install
+openssh_packages:
+  - openssh
+
+# Name of the OpenSSH service
+openssh_service: "sshd"
+
+# Command to use to validate the sshd configuration
+openssh_validate_cmd: "/usr/sbin/sshd -t -f %s"

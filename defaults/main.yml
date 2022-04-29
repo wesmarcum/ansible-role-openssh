@@ -1,0 +1,57 @@
+---
+# TCP port for the ssh server.
+openssh_port: 22
+
+# List of ip addresses that the server should listen on.  If the list is empty, all addresses will be used.
+openssh_listen_address: []
+
+# Permit both ipv4 and ipv6 by default.
+openssh_address_family: "any"
+
+# SSH access will be restricted to members of these groups.
+openssh_allowed_groups:
+  - ssh
+
+# Primary group for ssh users.  Users in the 'openssh_allowed_users' list will be automatically added to this group.
+openssh_primary_group: "ssh"
+
+# Users to be added to the ssh group.
+openssh_allowed_users: []
+
+# Allow TCP forwarding and agent forwarding for users defined in this list.
+openssh_forwarding_users: []
+
+# Display the warning banner on login.
+openssh_show_banner: true
+
+# Authentication methods required for successful login.
+openssh_auth_methods: "publickey"
+
+# Allow pubkey authentication.
+openssh_pubkey_auth: "yes"
+
+# Allow password authentication.
+openssh_password_auth: "no"
+
+# Allow kerberos / gssapi auth.
+openssh_kerberos_auth: "no"
+openssh_gssapi_auth: "no"
+
+# Permit logins directly as root.
+openssh_permit_root_login: "no"
+
+# Set max number of authentication attempts and max number of sessions per user.
+openssh_max_tries: 5
+openssh_max_sessions: 3
+
+# Set log level and syslog facility.
+openssh_loglevel: "VERBOSE"
+openssh_syslog_facility: "AUTH"
+
+# Disable DNS reverse lookup checks for incoming connections.
+openssh_use_dns: "no"
+
+# Enable / disable all connection tunneling / forwarding.
+openssh_enable_forwarding: false
+openssh_enable_agent_forwarding: "no"
+openssh_enable_x11_forwarding: "no"

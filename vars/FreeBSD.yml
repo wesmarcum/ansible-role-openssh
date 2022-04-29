@@ -1,0 +1,10 @@
+---
+# Owner/group for config files
+openssh_owner: "root"
+openssh_group: "wheel"
+
+# Name of the OpenSSH service
+openssh_service: "sshd"
+
+# Command to use to validate the sshd configuration
+openssh_validate_cmd: "/usr/sbin/sshd -t -f %s"

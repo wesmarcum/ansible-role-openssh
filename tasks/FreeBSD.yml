@@ -1,0 +1,12 @@
+---
+- name: Enable sshd service
+  ansible.builtin.blockinfile:
+    path: /etc/rc.conf.d/sshd
+    create: yes
+    owner: root
+    group: wheel
+    mode: '0640'
+    block: |
+      # Enable sshd service
+      sshd_enable="YES"
+  become: true

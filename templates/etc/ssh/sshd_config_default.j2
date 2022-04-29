@@ -1,0 +1,119 @@
+# managed by ansible
+# generated for {{ ansible_fqdn }}
+
+{% if openssh_version is version('8.0', '>') %}
+Include /etc/ssh/sshd_config.d/*.conf
+
+{% endif %}
+### Protocol / port
+Protocol 2                                  	                # Protocol 1 is fundamentally broken
+StrictModes yes                                                 # Protects from misconfiguration
+HostKey /etc/ssh/ssh_host_ed25519_key                           # Only allow ed25519 host keys
+
+Port {{ openssh_port }}
+AddressFamily {{ openssh_address_family }}
+{% if openssh_listen_address | length == 0 %}
+ListenAddress 0.0.0.0                                           # Listen on any addr
+ListenAddress ::
+{% else %}
+{%  for addr in openssh_listen_address %}
+ListenAddress {{ addr }}
+{%  endfor %}
+{% endif %}
+
+### Encryption algorithms
+HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,ssh-ed25519,ecdsa-sha2-nistp521,ecdsa-sha2-nistp384,ecdsa-sha2-nistp256
+{% if openssh_version is version('9.0', '>=') %}
+KexAlgorithms sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256,diffie-hellman-group18-sha512,diffie-hellman-group16-sha512,diffie-hellman-group14-sha256
+{% else %}
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256,diffie-hellman-group18-sha512,diffie-hellman-group16-sha512,diffie-hellman-group14-sha256
+{% endif %}
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com
+
+# Only allow incoming ECDSA and ed25519 sessions:
+HostbasedAcceptedKeyTypes ssh-ed25519,ecdsa-sha2-nistp521,ecdsa-sha2-nistp384,ecdsa-sha2-nistp256
+CASignatureAlgorithms ssh-ed25519,ecdsa-sha2-nistp521,ecdsa-sha2-nistp384,ecdsa-sha2-nistp256
+
+{% if openssh_version is version('8.2', '<') %}
+# Accepted public key types
+PubKeyAcceptedKeyTypes ssh-ed25519,ecdsa-sha2-nistp521,ecdsa-sha2-nistp384,ecdsa-sha2-nistp256
+{% else %}
+# Accepted public key types - including security keys for OpenSSH > 8.2
+PubkeyAcceptedKeyTypes sk-ssh-ed25519@openssh.com,ssh-ed25519,sk-ecdsa-sha2-nistp256@openssh.com,ecdsa-sha2-nistp521,ecdsa-sha2-nistp384,ecdsa-sha2-nistp256
+{% endif %}
+
+### Login Options
+AuthenticationMethods {{ openssh_auth_methods }}
+PubkeyAuthentication {{ openssh_pubkey_auth | string }}
+PermitRootLogin {{ openssh_permit_root_login | string }}
+UsePAM yes                                                      # Use PAM for password auth
+LoginGraceTime 1m                                               # Server will disconnect after this time limit if no sucessful login
+{# Include a list of groups allowed to use ssh, if specified.
+Also check for the list of allowed ssh users to prevent lockout. #}
+{% if openssh_allowed_groups | length > 0 and openssh_allowed_users | length > 0 %}
+AllowGroups {{ openssh_allowed_groups | join(' ') }}
+{% endif %}
+MaxAuthTries {{ openssh_max_tries }}
+MaxSessions {{ openssh_max_sessions }}
+
+PasswordAuthentication {{ openssh_password_auth | string }}
+PermitEmptyPasswords no                                         # No empty password authentcation allowed
+IgnoreRhosts yes                                                # Dont read users rhost files
+HostbasedAuthentication no                                      # Disable host-based authentication
+ChallengeResponseAuthentication no                              # Unused authentication scheme
+
+### Kerberos options
+KerberosAuthentication {{ openssh_kerberos_auth | string }}
+# KerberosOrLocalPasswd yes
+# KerberosTicketCleanup yes
+# KerberosGetAFSToken no
+
+### GSSAPI options
+GSSAPIAuthentication {{ openssh_gssapi_auth | string }}
+# GSSAPICleanupCredentials yes
+# GSSAPIStrictAcceptorCheck yes
+# GSSAPIKeyExchange no
+
+### Logging
+LogLevel {{ openssh_loglevel }}                                                # Fingerprint details of failed login attempts
+SyslogFacility {{ openssh_syslog_facility }}                                             # Logging authentication and authorization related commands
+UseDNS {{ openssh_use_dns | string }}                                                       # Client from a location without proper DNS generate a warning in the logs
+
+### Tunneling / forwarding
+{% if openssh_enable_forwarding | bool is false %}
+PermitTunnel no                                                 # Only SSH connection and nothing else
+AllowTcpForwarding no                                           # Disable tunneling out via SSH
+AllowStreamLocalForwarding no                                   # Disable tunneling out via SSH
+GatewayPorts no                                                 # Disable tunneling out via SSH
+{% else %}
+PermitTunnel yes
+AllowTcpForwarding yes
+AllowStreamLocalForwarding yes
+GatewayPorts yes
+{% endif %}
+AllowAgentForwarding {{ openssh_enable_agent_forwarding | string }}
+X11Forwarding {{ openssh_enable_x11_forwarding | string }}
+
+### Banner / last login
+{% if openssh_show_banner | bool is true %}
+Banner /etc/ssh/ssh_banner                                      # Show login warning banner
+{% endif %}
+PrintLastLog yes                                                # Show last login
+PrintMotd no                                                    # Don't print motd again
+
+### Session keepalives
+ClientAliveInterval 120                                         # Client timeout
+ClientAliveCountMax 3                                           # This way enforces timeouts on the server side
+MaxStartups 10:30:60                                            # Max unauthenticated concurrent SSH sessions
+TCPKeepAlive no                                                 # Do not use TCP keep alive
+
+AcceptEnv LANG LC_*                                             # Allow client to pass locale environment variables
+Subsystem sftp internal-sftp                                    # Enable sftp subsystem
+
+### User/group specific options
+{% if openssh_forwarding_users | length > 0 -%}
+Match User {{ openssh_forwarding_users | join(',') }}
+    AllowAgentForwarding yes
+    AllowTcpForwarding yes
+{% endif %}
