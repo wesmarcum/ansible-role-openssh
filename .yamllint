@@ -2,6 +2,7 @@
 extends: default
 
 rules:
+  comments-indentation: disable
   line-length:
     max: 200
     level: warning

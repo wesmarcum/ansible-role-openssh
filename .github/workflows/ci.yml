@@ -34,34 +34,34 @@ jobs:
         run: |
           yamllint .
 
-  molecule:
-    name: Molecule
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        distro:
-          - debian11
-          - debian10
-          - ubuntu2204
-          - ubuntu2004
+  # molecule:
+    # name: Molecule
+    # runs-on: ubuntu-latest
+    # strategy:
+      # matrix:
+        # distro:
+          # - debian11
+          # - debian10
+          # - ubuntu2204
+          # - ubuntu2004
 
-    steps:
-      - name: Check out the repo.
-        uses: actions/checkout@v2
-        with:
-          path: 'wesmarcum.openssh'
+    # steps:
+      # - name: Check out the repo.
+        # uses: actions/checkout@v2
+        # with:
+          # path: 'wesmarcum.openssh'
 
-      - name: Set up Python 3.
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
+      # - name: Set up Python 3.
+        # uses: actions/setup-python@v2
+        # with:
+          # python-version: '3.x'
 
-      - name: Install test dependencies.
-        run: pip3 install ansible ansible-lint yamllint molecule[podman] podman
+      # - name: Install test dependencies.
+        # run: pip3 install ansible ansible-lint yamllint molecule[podman] podman
 
-      - name: Run Molecule tests.
-        run: molecule test
-        env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRO: ${{ matrix.distro }}
+      # - name: Run Molecule tests.
+        # run: molecule test
+        # env:
+          # PY_COLORS: '1'
+          # ANSIBLE_FORCE_COLOR: '1'
+          # MOLECULE_DISTRO: ${{ matrix.distro }}
