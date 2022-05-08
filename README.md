@@ -16,6 +16,11 @@ Project goals:
 - Compatible with most popular Linux distros and FreeBSD.
 - Pass [ssh-audit](https://github.com/jtesta/ssh-audit) with flying colors.
 
+Installation
+------------
+
+Using Ansible Galaxy: `ansible-galaxy install wesmarcum.openssh`
+
 Requirements
 ------------
 
