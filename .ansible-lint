@@ -3,3 +3,4 @@ skip_list:
   - 'yaml'
   - 'role-name'
   - 'command-instead-of-module'
+  - 'experimental'
