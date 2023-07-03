@@ -22,6 +22,7 @@
         - tasks
 
 - name: Set ssh version
+  when: openssh_version is not defined
   block:
     - name: Run ssh -V
       ansible.builtin.command: /usr/bin/ssh -V
@@ -31,7 +32,6 @@
     - name: Set fact for openssh version
       ansible.builtin.set_fact:
         openssh_version: "{{ openssh_version_output.stderr | regex_search('\\d+\\.\\d') }}"
-  when: openssh_version is not defined
 
 - name: Create groups for ssh users
   ansible.builtin.group:
