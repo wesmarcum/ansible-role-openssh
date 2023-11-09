@@ -99,7 +99,6 @@ X11Forwarding {{ openssh_enable_x11_forwarding | string }}
 {% if openssh_show_banner | bool is true %}
 Banner /etc/ssh/ssh_banner                                      # Show login warning banner
 {% endif %}
-PrintLastLog yes                                                # Show last login
 PrintMotd no                                                    # Don't print motd again
 
 ### Session keepalives
