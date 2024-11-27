@@ -1,13 +1,14 @@
 Ansible Role: openssh
 =================
+
 [![Galaxy Role][badge-galaxy]][link-galaxy]
-[![Ansible Quality Score][badge-quality]][link-galaxy]
 [![MIT licensed][badge-license]][link-license]
 [![CI][badge-gh-actions]][link-gh-actions]
 
 Install and configure the [openssh](https://www.openssh.com/) server.
 
 Project goals:
+
 - Secure with minimal configuration.
 - Pubkey only authentication by default.
 - Use only modern elliptic curve crypto.
@@ -60,6 +61,7 @@ Example Playbook
 ----------------
 
 Minimal playbook:
+
 ```yaml
 ---
 - name: Install openssh
@@ -70,6 +72,7 @@ Minimal playbook:
 ```
 
 Limit the users allowed to use ssh with the `openssh_allowed_users` variable.  Enable tcp and agent forwarding with `openssh_forwarding_users`:
+
 ```yaml
 ---
 - name: Install openssh
@@ -93,7 +96,7 @@ Compatibility
 | Arch Linux | all          |
 | Debian     | 10, 11, 12   |
 | FreeBSD    | 13           |
-| Ubuntu     | 20.04, 22.04 |
+| Ubuntu     | 20.04, 22.04, 24.04 |
 
 License
 -------
@@ -103,12 +106,11 @@ MIT
 Author Information
 ------------------
 
-https://github.com/wesmarcum/
+<https://github.com/wesmarcum/>
 
 [badge-license]: https://img.shields.io/badge/license-MIT-green?
 [link-license]: https://github.com/wesmarcum/ansible-role-openssh/blob/main/LICENSE
 [badge-gh-actions]: https://github.com/wesmarcum/ansible-role-openssh/workflows/CI/badge.svg?event=push
 [link-gh-actions]: https://github.com/wesmarcum/ansible-role-openssh/actions?query=workflow%3ACI
 [badge-galaxy]: https://img.shields.io/badge/role-openssh-blue
-[link-galaxy]: https://galaxy.ansible.com/wesmarcum/openssh
-[badge-quality]: https://img.shields.io/ansible/quality/59023
+[link-galaxy]: https://galaxy.ansible.com/ui/standalone/roles/wesmarcum/openssh/
